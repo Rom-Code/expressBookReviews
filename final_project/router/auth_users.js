@@ -54,11 +54,14 @@ regd_users.post("/login", (req, res) => {
 });
 
 //Add a book review
-// Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
     const isbn = req.params.isbn;
-    const review = req.query.review;
+    const review = req.query.review; // or req.body.review if using request body
     const username = req.session.authorization.username;
+
+    console.log('ISBN:', isbn);
+    console.log('Review:', review);
+    console.log('Username:', username);
 
     if (books[isbn]) {
         if (!books[isbn].reviews) {
@@ -68,6 +71,20 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
         return res.status(200).json({ message: "Review successfully added/updated" });
     } else {
         return res.status(404).json({ message: "Book not found" });
+    }
+});
+
+//Delete review
+
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    const isbn = req.params.isbn;
+    const username = req.session.authorization.username;
+
+    if (books[isbn] && books[isbn].reviews && books[isbn].reviews[username]) {
+        delete books[isbn].reviews[username];
+        return res.status(200).json({ message: "Review successfully deleted" });
+    } else {
+        return res.status(404).json({ message: "Review not found or you're not authorized to delete this review" });
     }
 });
 
